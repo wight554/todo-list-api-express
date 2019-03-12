@@ -6,7 +6,8 @@ const express = require('express'),
 const app = express(),
       port = process.env.PORT || 3000,
       mongoClient = mongodb.MongoClient,
-      mongoUrl = process.env.MONGODB_URI || `mongodb://localhost:27017/todo-api`,
+      mongoUrl = process.env.MONGODB_URI ||
+                 'mongodb://localhost:27017/todo-api',
       ObjectId = mongodb.ObjectID;
 
 let mongo = {};
@@ -24,11 +25,10 @@ mongoClient
     });
 
 app.get('/', (req, res) => {
-    mongo
-        .collection('tasks').find().toArray()
-        .then(tasks => {
+    mongo.collection('tasks').find().toArray()
+         .then(tasks => {
             res.render('', { tasks });
-        })
+         })
 });
 
 app.get('/tasks/new', (req, res) => {
@@ -36,50 +36,46 @@ app.get('/tasks/new', (req, res) => {
 });
 
 app.post('/tasks', (req, res) => {
-    mongo
-        .collection('tasks')
-        .insertOne(req.body)
-        .then(() => {
+    mongo.collection('tasks')
+         .insertOne(req.body)
+         .then(() => {
             res.redirect('/');
-    });
+         });
 });
 
 app.get('/tasks/:id', (req, res) => {
-    mongo
-        .collection('tasks')
-        .findOne({ _id: ObjectId(req.params.id) })
-        .then(task => {
+    mongo.collection('tasks')
+         .findOne({ _id: ObjectId(req.params.id) })
+         .then(task => {
             res.render('show', { task });
-        });
+         });
 });
 
 app.get('/tasks/:id/edit', (req, res) => {
-    mongo
-        .collection('tasks')
-        .findOne({ _id: ObjectId(req.params.id) })
-        .then(task => {
+    mongo.collection('tasks')
+         .findOne({ _id: ObjectId(req.params.id) })
+         .then(task => {
             res.render('edit', { task });
-        });
+         });
 });
 
 app.post('/tasks/:id/update', (req, res) => {
-    mongo
-        .collection('tasks')
-        .updateOne({ _id: ObjectId(req.params.id) }, {$set: {"name": req.body.name}})
-        .then(() => {
+    mongo.collection('tasks')
+         .updateOne({ _id: ObjectId(req.params.id) },
+                    {$set: {'name': req.body.name}})
+         .then(() => {
             res.redirect('/');
-        });
+         });
 });
 
 app.delete('/tasks/:id/destroy', (req, res) => {
-    mongo
-        .collection('tasks')
-        .deleteOne({ _id: ObjectId(req.params.id) })
-        .then(() => {
+    mongo.collection('tasks')
+         .deleteOne({ _id: ObjectId(req.params.id) })
+         .then(() => {
             res.redirect('/');
-        });
+         });
 });
 
 app.listen(port, () => {
-    console.log("APP IS RUNNING ON PORT " + port);
+    console.log(`App is running on port ${port}`);
 })
