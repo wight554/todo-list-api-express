@@ -5,7 +5,7 @@ const express = require('express'),
 
 const mongodb = require('mongodb'),
       mongoClient = mongodb.MongoClient,
-      mongoUrl = `mongodb://localhost:27017/todo-api`,
+      mongoUrl = process.env.MONGODB_URI || `mongodb://localhost:27017/todo-api`,
       ObjectId = mongodb.ObjectID;
 
 let mongo = {};
