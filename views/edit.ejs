@@ -10,7 +10,10 @@
     </div>
     <input type="submit" value="Submit" />
 </form>
-
 <div>
     <a href="/">Back</a>
+    &nbsp;
+    <form method="POST" action="/tasks/<%= task._id %>/destroy?_method=DELETE" style="display:inline">
+        <a href="javascript:{};" onclick="this.parentNode.submit();">Delete</a>
+    </form>
 </div>

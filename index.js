@@ -1,9 +1,10 @@
 const express = require('express'),
-      app = express(),
-      port = process.env.PORT || 3000,
-      bodyParser = require('body-parser');
+      bodyParser = require('body-parser'),
+      methodOverride = require('method-override'),
+      mongodb = require('mongodb');
 
-const mongodb = require('mongodb'),
+const app = express(),
+      port = process.env.PORT || 3000,
       mongoClient = mongodb.MongoClient,
       mongoUrl = process.env.MONGODB_URI || `mongodb://localhost:27017/todo-api`,
       ObjectId = mongodb.ObjectID;
@@ -12,16 +13,17 @@ let mongo = {};
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(methodOverride('_method'))
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 mongoClient
-    .connect(mongoUrl)
-    .then(function(client) {
+    .connect(mongoUrl, { useNewUrlParser: true })
+    .then(client => {
         mongo = client.db();
     });
 
-app.get('/', function(req, res){
+app.get('/', (req, res) => {
     mongo
         .collection('tasks').find().toArray()
         .then(tasks => {
@@ -29,20 +31,20 @@ app.get('/', function(req, res){
         })
 });
 
-app.get('/tasks/new', function(req, res) {
+app.get('/tasks/new', (req, res) => {
     res.render('new');
 });
 
-app.post('/tasks', function(req, res) {
+app.post('/tasks', (req, res) => {
     mongo
         .collection('tasks')
         .insertOne(req.body)
-        .then(function() {
+        .then(() => {
             res.redirect('/');
     });
 });
 
-app.get('/tasks/:id', function(req, res) {
+app.get('/tasks/:id', (req, res) => {
     mongo
         .collection('tasks')
         .findOne({ _id: ObjectId(req.params.id) })
@@ -51,7 +53,7 @@ app.get('/tasks/:id', function(req, res) {
         });
 });
 
-app.get('/tasks/:id/edit', function(req, res) {
+app.get('/tasks/:id/edit', (req, res) => {
     mongo
         .collection('tasks')
         .findOne({ _id: ObjectId(req.params.id) })
@@ -60,24 +62,24 @@ app.get('/tasks/:id/edit', function(req, res) {
         });
 });
 
-app.post('/tasks/:id/update', function(req, res) {
+app.post('/tasks/:id/update', (req, res) => {
     mongo
         .collection('tasks')
-        .update({ _id: ObjectId(req.params.id) }, req.body)
-        .then(function() {
+        .updateOne({ _id: ObjectId(req.params.id) }, {$set: {"name": req.body.name}})
+        .then(() => {
             res.redirect('/');
         });
 });
 
-app.get('/tasks/:id/destroy', function(req, res) {
+app.delete('/tasks/:id/destroy', (req, res) => {
     mongo
         .collection('tasks')
         .deleteOne({ _id: ObjectId(req.params.id) })
-        .then(function() {
+        .then(() => {
             res.redirect('/');
         });
 });
 
-app.listen(port, function(){
+app.listen(port, () => {
     console.log("APP IS RUNNING ON PORT " + port);
 })
